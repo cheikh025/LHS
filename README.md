@@ -118,6 +118,25 @@ Optional:
 
 - `--llm_init --llm_init_count 20` to initialize search with freshly generated programs.
 
+## More Parameters
+
+The commands above show only the core arguments. Additional hyperparameters and runtime options are available in:
+
+- `train_unified_flow.py`
+- `train_unified_mapper.py`
+- `ranking_score_predictor.py`
+- `gradient_search.py`
+- `model_config.py` (default model names and embedding dimension)
+
+You can inspect all CLI options with:
+
+```bash
+python3 train_unified_flow.py --help
+python3 train_unified_mapper.py --help
+python3 ranking_score_predictor.py --help
+python3 gradient_search.py --help
+```
+
 ## Outputs
 
 Typical generated directories/files:
