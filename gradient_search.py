@@ -147,8 +147,8 @@ def load_decoder(model_name: str = None, device: str = "cuda"):
 
 
 def load_mapper(mapper_path: str, decoder_model, device: str = "cuda"):
-    """Load trained mapper model (supports both OriginalMapper and LowRankMapper)."""
-    from mapper import OriginalMapper, LowRankMapper
+    """Load trained mapper model (supports both MLPlMapper and LowRankMapper)."""
+    from mapper import MLPlMapper, LowRankMapper
 
     print(f"Loading mapper from {mapper_path}...")
 
@@ -190,9 +190,12 @@ def load_mapper(mapper_path: str, decoder_model, device: str = "cuda"):
         if 'feature_expander.weight' in state_dict:
             mapper_type = 'LowRankMapper'
         elif 'mlp.0.weight' in state_dict:
-            mapper_type = 'OriginalMapper'
+            mapper_type = 'MLPlMapper'
         else:
             raise ValueError("Cannot detect mapper type from checkpoint keys")
+    elif mapper_type == 'OriginalMapper':
+        # Backward compatibility with legacy checkpoints.
+        mapper_type = 'MLPlMapper'
 
     print(f"  Mapper type: {mapper_type}")
 
@@ -239,7 +242,7 @@ def load_mapper(mapper_path: str, decoder_model, device: str = "cuda"):
             use_ffn=use_ffn
         )
 
-    else:  # OriginalMapper
+    else:  # MLPlMapper
         if input_dim is None:
             input_dim = state_dict['mlp.0.weight'].shape[1]
         if output_dim is None:
@@ -252,7 +255,7 @@ def load_mapper(mapper_path: str, decoder_model, device: str = "cuda"):
         print(f"  Output dim: {output_dim}")
         print(f"  Num tokens: {num_tokens}")
 
-        mapper_model = OriginalMapper(input_dim, output_dim, num_tokens)
+        mapper_model = MLPlMapper(input_dim, output_dim, num_tokens)
 
     mapper_model.load_state_dict(state_dict)
     mapper_model.eval()

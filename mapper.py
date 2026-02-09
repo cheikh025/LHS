@@ -6,11 +6,11 @@ import torch.nn.functional as F
 import random
 from torch.nn.utils.rnn import pad_sequence
 
-class OriginalMapper(nn.Module):
+class MLPlMapper(nn.Module):
     """
-    Original MLP mapper: maps a latent vector z to a sequence of soft prompt vectors.
+    MLP mapper: maps a latent vector z to a sequence of soft prompt vectors.
 
-    This is the original high-capacity mapper. For smaller datasets, consider using
+    This is the high-capacity mapper. For smaller datasets, consider using
     LowRankMapper instead.
 
     Architecture: input_dim -> output_dim -> output_dim -> output_dim * num_tokens
@@ -52,7 +52,7 @@ class LowRankMapper(nn.Module):
 
     Parameter count: ~O(num_tokens * input_dim + internal_dim * output_dim + attn overhead)
     For input_dim=128, output_dim=2560, num_tokens=16, internal_dim=512:
-    ~1.8M parameters (vs ~40M+ for original mapper)
+    ~1.8M parameters (vs ~40M+ for MLPlMapper)
 
     Args:
         input_dim: Dimension of input latent vector z
@@ -149,7 +149,7 @@ class LowRankMapper(nn.Module):
 
 
 # Default Mapper - use LowRankMapper for better parameter efficiency
-# Change this alias to switch the default mapper used throughout the codebase
+# Change this alias to switch the default mapper used throughout the codebase.
 Mapper = LowRankMapper
     
 

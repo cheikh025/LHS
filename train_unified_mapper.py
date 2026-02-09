@@ -33,7 +33,7 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from tqdm import tqdm
 
-from mapper import Mapper, LowRankMapper, OriginalMapper
+from mapper import Mapper, LowRankMapper, MLPlMapper
 from utils import is_valid_python
 from model_config import DEFAULT_ENCODER, DEFAULT_DECODER, DEFAULT_MATRYOSHKA_DIM
 from load_encoder_decoder import load_encoder
@@ -614,7 +614,7 @@ def main(resume_checkpoint: Optional[str] = None, encoder_name: str = None, deco
     use_ffn = True           # Include FFN block after attention
 
     # Use LowRankMapper with attention for better parameter efficiency on smaller datasets
-    # For ~4600 samples, LowRankMapper (~1.8M params) is safer than OriginalMapper (~40M+ params)
+    # For ~4600 samples, LowRankMapper (~1.8M params) is safer than MLPlMapper (~40M+ params)
     mapper_model = LowRankMapper(
         input_dim=input_dim,
         output_dim=output_dim,
