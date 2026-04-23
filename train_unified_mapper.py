@@ -401,19 +401,21 @@ def train_unified_mapper_optimized(
                     {"role": "assistant", "content": code_text},
                 ]
 
-                prompt_ids = decoder_tokenizer.apply_chat_template(
+                prompt_text = decoder_tokenizer.apply_chat_template(
                     prompt_messages,
-                    tokenize=True,
+                    tokenize=False,
                     add_generation_prompt=True,
-                    truncation=True,
-                    max_length=max_length,
                 )
-                full_ids = decoder_tokenizer.apply_chat_template(
+                prompt_ids = decoder_tokenizer.encode(
+                    prompt_text, truncation=True, max_length=max_length
+                )
+                full_text = decoder_tokenizer.apply_chat_template(
                     full_messages,
-                    tokenize=True,
+                    tokenize=False,
                     add_generation_prompt=False,
-                    truncation=True,
-                    max_length=max_length,
+                )
+                full_ids = decoder_tokenizer.encode(
+                    full_text, truncation=True, max_length=max_length
                 )
 
                 if len(full_ids) < len(prompt_ids):

@@ -695,7 +695,7 @@ def save_ranking_predictor(
 
 def load_ranking_predictor(path: str, device: str = 'cuda') -> Tuple[RankingScorePredictor, Dict]:
     """Load ranking predictor from disk."""
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(path, map_location=device, weights_only=False)
 
     predictor = RankingScorePredictor(
         input_dim=checkpoint['input_dim'],
@@ -773,7 +773,7 @@ def main():
     # Load flow model
     from normalizing_flow import NormalizingFlow
 
-    flow_checkpoint = torch.load(args.flow_path, map_location=args.device)
+    flow_checkpoint = torch.load(args.flow_path, map_location=args.device, weights_only=False)
     flow_dim = flow_checkpoint.get('dim', flow_checkpoint.get('flow_dim', flow_checkpoint.get('embedding_dim', 768)))
     flow_num_layers = flow_checkpoint.get('num_layers', flow_checkpoint.get('flow_num_layers', 4))
     flow_hidden_dim = flow_checkpoint.get('hidden_dim', flow_checkpoint.get('flow_hidden_dim', 128))

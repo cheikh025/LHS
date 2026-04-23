@@ -1,6 +1,6 @@
 template_program = '''
 import numpy as np
-def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray, rest_capacity: np.ndarray, demands: np.ndarray, distance_matrix: np.ndarray) -> int:
+def select_next_node(current_node: int, depot: int, unvisited_nodes: np.ndarray, rest_capacity: int, demands: np.ndarray, distance_matrix: np.ndarray) -> int:
     """Design a novel algorithm to select the next node in each step.
     Args:
         current_node: ID of the current node.

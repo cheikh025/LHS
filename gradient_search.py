@@ -152,7 +152,7 @@ def load_mapper(mapper_path: str, decoder_model, device: str = "cuda"):
 
     print(f"Loading mapper from {mapper_path}...")
 
-    checkpoint = torch.load(mapper_path, map_location=device)
+    checkpoint = torch.load(mapper_path, map_location=device, weights_only=False)
 
     if 'model_state_dict' in checkpoint:
         state_dict = checkpoint['model_state_dict']
@@ -267,7 +267,7 @@ def load_flow(flow_path: str, device: str = "cuda"):
     """Load trained normalizing flow."""
     print(f"Loading normalizing flow from {flow_path}...")
 
-    checkpoint = torch.load(flow_path, map_location=device)
+    checkpoint = torch.load(flow_path, map_location=device, weights_only=False)
 
     # Extract architecture parameters
     dim = checkpoint.get('dim', checkpoint.get('embedding_dim', 768))
@@ -572,7 +572,10 @@ def generate_code_from_z_batch(
             tokenize=True,
             add_generation_prompt=True,
             return_tensors="pt"
-        ).to(device)
+        )
+        if hasattr(instruction_ids, "input_ids"):
+            instruction_ids = instruction_ids.input_ids
+        instruction_ids = instruction_ids.to(device)
 
         # Get instruction embeddings and repeat for batch
         instruction_embeds = embed_layer(instruction_ids)  # [1, seq_len, hidden]
@@ -1334,8 +1337,19 @@ def main():
                         help='Use LLM to generate initial programs instead of loading from JSON')
     parser.add_argument('--llm_init_count', type=int, default=20,
                         help='Number of programs to generate for LLM initialization (default: 20)')
+    parser.add_argument('--seed', type=int, default=0,
+                        help='Random seed for reproducibility (default: 0)')
 
     args = parser.parse_args()
+
+    import random
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+
+    output_dir = os.path.join(args.output_dir, f"seed_{args.seed}")
 
     results, programs = gradient_search_pipeline_u(
         task_name=args.task,
@@ -1353,7 +1367,7 @@ def main():
         decoder_name=args.decoder,
         embedding_dim=getattr(args, 'embedding_dim', None),
         device=args.device,
-        output_dir=args.output_dir,
+        output_dir=output_dir,
         num_evaluators=args.num_evaluators,
         generation_batch_size=args.generation_batch_size,
         llm_init=args.llm_init,
